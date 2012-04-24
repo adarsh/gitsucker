@@ -1,6 +1,9 @@
 This is my response to a coding challenge. Below is the problem definition.
 
 
+Gitsucker
+=========
+
 There once was a developer who started a company. As the company grew he had to
 find more and more like-minded engineers to join his mission to change the
 world. Being a technologist at heart, he thought the best place to find these
