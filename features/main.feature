@@ -11,3 +11,5 @@ Feature: Use gitsucker to find engineers based on a github project
     Examples:
       | repo     | number_of_forks |
       | fistface | 6               |
+      | bourne   | 6               |
+      | flutie   | 19              |

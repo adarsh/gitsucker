@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
+require 'net/http'
+require 'open-uri'
+require 'json'
 
 class GithubRepo
   # Constants
@@ -7,10 +10,14 @@ class GithubRepo
 
   def initialize(repo)
     @repo = repo
+    @author = 'thoughtbot'
   end
 
   def number_of_repos
-    6
+    url = GIT_API_URL + @author + "/" + @repo
+    content = open(url).read
+    data = JSON.parse(content)
+    data["forks"]
   end
 end
 
