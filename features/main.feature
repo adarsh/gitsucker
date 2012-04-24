@@ -4,12 +4,13 @@ Feature: Use gitsucker to find engineers based on a github project
   I should be able to give a github project name and get back engineers
 
   Scenario Outline: Get github members who have forked a project
-    Given I have a github repo called "<repo>"
+    Given I have a github repo called "fistface"
     When I enter the github repo name
-    Then I should get <number_of_forks> forks
+    Then I should get "<author>, <all_projects>, <originals>, <forked>, <ruby>, <js>"
 
     Examples:
-      | repo     | number_of_forks |
-      | fistface | 6               |
-      | bourne   | 6               |
-      | flutie   | 19              |
+      | author     | all_projects | originals | forked | ruby | js |
+      | garethrees | 2            | 1         | 1      | 1    | 1  |
+      | caozhzh    | 2            | 1         | 1      | 1    | 1  |
+      | mbleigh    | 2            | 1         | 1      | 1    | 1  |
+      | donhill    | 2            | 1         | 1      | 1    | 1  |

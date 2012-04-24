@@ -7,6 +7,6 @@ When /^I enter the github repo name$/ do
   raise('Command failed') unless $?.success?
 end
 
-Then /^I should get (\d+) forks$/ do |expected_output|
+Then /^I should get "([^"]*)"$/ do |expected_output|
   @output.chomp.should == expected_output
 end

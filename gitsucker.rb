@@ -9,16 +9,42 @@ class GithubRepo
   # Constants
   GIT_REPO_SEARCH_URL = 'https://github.com/api/v2/xml/repos/search/'
   GIT_API_URL = 'https://api.github.com/repos/'
+  GIT_USER_URL = 'https://api.github.com/users/'
 
   # Methods
-  def initialize(repo)
-    repo = repo
+  def initialize(repository)
+    repo = repository
     author = determine_author(repo)
-    fetch_repo_data(repo, author)
+    get_fork_authors(repo, author)
   end
 
-  def number_of_repos
-    @repo_data["forks"]
+  def fork_authors
+    @forking_authors
+  end
+
+  def get_fork_authors(repo, author)
+    forks = get_fork_data(repo, author)
+
+    @forking_authors = []
+
+    forks.each do |fork|
+      fork_author = fork["owner"]["login"]
+      originals = 1
+      forked = 1
+      all_projects = originals + forked
+      ruby = 1
+      js = 1
+      @forking_authors << {
+        :fork_author => fork_author,
+        :all_projects => all_projects,
+        :originals => originals,
+        :forked => forked,
+        :ruby => ruby,
+        :js => js
+      }
+    end
+
+    @forking_authors
   end
 
   private
@@ -34,8 +60,21 @@ class GithubRepo
     content = open(url).read
     @repo_data = JSON.parse(content)
   end
+
+  def get_fork_data(repo, author)
+    url = GIT_API_URL + author + "/" + repo + "/forks"
+    content = open(url).read
+    JSON.parse(open(url).read)
+  end
 end
 
 ARGV.each do |input|
-  puts GithubRepo.new(input).number_of_repos
+  repo = GithubRepo.new(input)
+  # puts repo.fork_authors.inspect
+  repo.fork_authors.each do |forking_author|
+    forking_author.each do |key, value|
+      puts "#{key}: #{value}"
+    end
+    puts
+  end
 end
