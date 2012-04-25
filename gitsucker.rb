@@ -29,32 +29,9 @@ class Query
     @forking_authors
   end
 
-  def get_forking_authors(repo, author)
-    forks = get_fork_data(repo, author)
-
-    @forking_authors = forks.collect do |fork|
-      author_name = fork["owner"]["login"]
-      fork_author = Author.new(author_name)
-      make_author_hash(fork_author)
-      fork_author
-    end
-
-    sort_the_authors(@forking_authors)
-  end
-
   private
 
-  def add_score_to_author(author)
-    score = author.originals * 3
-    score += author.ruby * 2
-    score += author.js * 2
-    score += author.forked * 1
-
-    author.score = score
-    author
-  end
-
-  def make_author_hash(fork_author)
+  def add_author_attributes(fork_author)
     user_page = fetch_user_profile(fork_author.name)
 
     fork_author.all_projects = public_repo_count(user_page)
@@ -64,20 +41,21 @@ class Query
     fork_author.js           = js_repo_count(user_page)
 
     add_score_to_author(fork_author)
-    fork_author
+  end
+
+  def add_score_to_author(author)
+    score = author.originals * 3
+    score += author.ruby * 2
+    score += author.js * 2
+    score += author.forked * 1
+
+    author.score = score
   end
 
   def determine_author(query)
     url = GIT_REPO_SEARCH_URL + query
-    content = open(url).read
-    results = JSON.parse(content)
-    first_search_result_username = results["repositories"].first["username"]
-  end
-
-  def fetch_repo_data(repo, author)
-    url = GIT_API_URL + author + "/" + repo
-    content = open(url).read
-    @repo_data = JSON.parse(content)
+    results = JSON.parse(open(url).read)
+    results["repositories"].first["username"]
   end
 
   def fetch_user_profile(author)
@@ -88,16 +66,23 @@ class Query
     public_repo_count(page) - original_repo_count(page)
   end
 
-  def get_author_info(author)
-    url = GIT_USER_INFO_URL + author
-    content = open(url).read
-    JSON.parse(content)
-  end
-
   def get_fork_data(repo, author)
     url = GIT_API_URL + author + "/" + repo + "/forks"
     content = open(url).read
     JSON.parse(open(url).read)
+  end
+
+  def get_forking_authors(repo, author)
+    forks = get_fork_data(repo, author)
+
+    @forking_authors = forks.collect do |fork|
+      author_name = fork["owner"]["login"]
+      fork_author = Author.new(author_name)
+      add_author_attributes(fork_author)
+      fork_author
+    end
+
+    sort_authors_by_score(@forking_authors)
   end
 
   def js_repo_count(page)
@@ -116,7 +101,7 @@ class Query
     page.css("ul.repo-stats").select{|li| li.text =~ /Ruby/}.count
   end
 
-  def sort_the_authors(array_of_objects)
+  def sort_authors_by_score(array_of_objects)
     array_of_objects.sort_by! { |obj| -obj.score }
   end
 end
@@ -129,9 +114,7 @@ ARGV.each do |input|
   headers = ["name", "all projects", "originals", "forked", "ruby", "js",
     "score"]
 
-  headers.each do |title|
-    printf "%-13s", title
-  end
+  headers.each { |title| printf "%-13s", title }
 
   puts
   85.times { print '=' }
