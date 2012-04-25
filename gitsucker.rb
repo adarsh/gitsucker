@@ -118,10 +118,17 @@ ARGV.each do |input|
   puts "Fetching data..."
   repo = GithubRepo.new(input)
 
+  repo.fork_authors.first.each do |key, value|
+    printf "%-13s", key
+  end
+
+  puts
+  80.times { print '=' }
+  puts
+
   repo.fork_authors.each do |forking_author|
     forking_author.each do |key, value|
-      # print value.to_s
-      printf "%-20s %s\n", key, value.to_s
+      printf "%-13s", value.to_s
     end
 
     puts
