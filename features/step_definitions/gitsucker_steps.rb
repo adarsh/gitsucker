@@ -7,6 +7,11 @@ When /^I enter the github repo name$/ do
   raise('Command failed') unless $?.success?
 end
 
-Then /^I should get "([^"]*)"$/ do |expected_output|
+Then /^I should get the following attributes:$/ do |table|
+  expected_output = []
+  table.hashes.each do |attributes|
+    expected_output << attributes
+  end
+
   @output.chomp.should == expected_output
 end
