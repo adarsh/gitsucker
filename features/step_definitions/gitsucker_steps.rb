@@ -7,11 +7,9 @@ When /^I enter the github repo name$/ do
   raise('Command failed') unless $?.success?
 end
 
-Then /^I should get the following attributes:$/ do |table|
-  expected_output = []
-  table.hashes.each do |attributes|
-    expected_output << attributes
-  end
-
-  @output.chomp.should == expected_output
+Then /^I should get the appropriate output$/ do
+  @output.should include("garethrees, 33, 24, 9, 18, 3")
+  @output.should include("caozhzh, 9, 5, 4, 7, 0")
+  @output.should include("mbleigh, 64, 36, 28, 51, 5")
+  @output.should include("donhill, 14, 1, 13, 6, 0")
 end

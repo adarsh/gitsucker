@@ -6,9 +6,4 @@ Feature: Use gitsucker to find engineers based on a github project
   Scenario: Get github members who have forked a project
     Given I have a github repo called "fistface"
     When I enter the github repo name
-    Then I should get the following attributes:
-      | author     | all_projects | originals | forked | ruby | js |
-      | garethrees | 2            | 1         | 1      | 1    | 1  |
-      | caozhzh    | 2            | 1         | 1      | 1    | 1  |
-      | mbleigh    | 2            | 1         | 1      | 1    | 1  |
-      | donhill    | 2            | 1         | 1      | 1    | 1  |
+    Then I should get the appropriate output
