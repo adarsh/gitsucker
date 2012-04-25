@@ -5,7 +5,7 @@ require 'open-uri'
 require 'nokogiri'
 require 'json'
 
-class GithubRepo
+class Query
   # Constants
   GIT_REPO_SEARCH_URL = 'https://api.github.com/legacy/repos/search/'
   GIT_API_URL = 'https://api.github.com/repos/'
@@ -116,14 +116,14 @@ end
 # Command-Line Parsing
 ARGV.each do |input|
   puts "Fetching data..."
-  repo = GithubRepo.new(input)
+  repo = Query.new(input)
 
   repo.fork_authors.first.each do |key, value|
     printf "%-13s", key
   end
 
   puts
-  80.times { print '=' }
+  85.times { print '=' }
   puts
 
   repo.fork_authors.each do |forking_author|
