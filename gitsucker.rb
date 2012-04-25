@@ -7,8 +7,7 @@ require 'json'
 
 class GithubRepo
   # Constants
-  GIT_REPO_SEARCH_URL = 'https://github.com/api/v2/xml/repos/search/'
-  # switch for 'https://api.github.com/legacy/repos/search/:keyword'
+  GIT_REPO_SEARCH_URL = 'https://api.github.com/legacy/repos/search/'
   GIT_API_URL = 'https://api.github.com/repos/'
   GIT_USER_INFO_URL = 'https://api.github.com/users/'
   GIT_USER_PROFILE_URL = 'https://github.com/'
@@ -58,8 +57,9 @@ class GithubRepo
 
   def determine_author(query)
     url = GIT_REPO_SEARCH_URL + query
-    results = Nokogiri::XML(open(url))
-    first_search_result_username = results.css("username").first.content
+    content = open(url).read
+    results = JSON.parse(content)
+    first_search_result_username = results["repositories"].first["username"].to_s
   end
 
   def fetch_repo_data(repo, author)
