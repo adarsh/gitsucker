@@ -39,13 +39,16 @@ class GithubRepo
       ruby = ruby_repo_count(user_page)
       js = js_repo_count(user_page)
 
-      @forking_authors << {
+      author_hash = {
         :fork_author  => fork_author,
         :all_projects => all_projects,
         :originals    => originals,
         :forked       => forked,
         :ruby         => ruby,
         :js           => js }
+
+      author_hash = score_author(author_hash)
+      @forking_authors << author_hash
     end
   end
 
@@ -94,22 +97,27 @@ class GithubRepo
   def ruby_repo_count(page)
     page.css("ul.repo-stats").select{|li| li.text =~ /Ruby/}.count
   end
+
+  def score_author(author)
+    author[:score] = "999"
+    author
+  end
 end
 
 # Command-Line Parsing
 ARGV.each do |input|
   repo = GithubRepo.new(input)
+  puts "Username/projects/original/forked/ruby/js/score"
 
   repo.fork_authors.each do |forking_author|
 
     forking_author.each do |key, value|
-      if key == "js"
-        print value.to_s
+      print value.to_s
+      if key == :score
+        puts
       else
-        print value.to_s + ", "
+        print ", "
       end
     end
-
-    puts
   end
 end
