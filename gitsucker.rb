@@ -1,18 +1,16 @@
 #!/usr/bin/env ruby
-require 'rubygems'
-require 'net/http'
+# Libraries
 require 'open-uri'
 require 'nokogiri'
 require 'json'
 
-class Query
-  # Constants
-  GIT_REPO_SEARCH_URL = 'https://api.github.com/legacy/repos/search/'
-  GIT_API_URL = 'https://api.github.com/repos/'
-  GIT_USER_INFO_URL = 'https://api.github.com/users/'
-  GIT_USER_PROFILE_URL = 'https://github.com/'
+# Constants
+GIT_REPO_SEARCH_URL = 'https://api.github.com/legacy/repos/search/'
+GIT_API_URL = 'https://api.github.com/repos/'
+GIT_USER_INFO_URL = 'https://api.github.com/users/'
+GIT_USER_PROFILE_URL = 'https://github.com/'
 
-  # Methods
+class Query
   def initialize(repository)
     repo = repository
     author = determine_author(repo)
@@ -112,6 +110,7 @@ class Query
     @forking_authors = @forking_authors.sort_by { |hsh| -hsh[:score] }
   end
 end
+
 
 # Command-Line Parsing
 ARGV.each do |input|

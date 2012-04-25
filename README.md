@@ -12,7 +12,7 @@ manually mining through profiles and projects to find the best engineers. Being
 a lazy engineer, he decided to automate this mundane task in a tool he called
 gitsucker.  Here is a description of how he'd like the tool to work:
 
-1. Type in gitsucker <project_name> (e.g. `gitsucker backbone`)
+1. Type in `gitsucker <project_name>` (e.g. `gitsucker backbone`)
 2. Find the git repo and all the Github users who forked the project
 3. Output statistics on each user including:
  * Number of original projects authored
