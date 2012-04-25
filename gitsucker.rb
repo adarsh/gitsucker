@@ -31,27 +31,22 @@ class GithubRepo
 
     forks.each do |fork|
       fork_author = fork["owner"]["login"]
+      user_page = fetch_user_profile(fork_author)
 
-      user_page = Nokogiri::HTML(open(GIT_USER_PROFILE_URL + fork_author))
-
-      all_projects = user_page.css(".public").count
-      originals = user_page.css(".source").count
+      all_projects = public_repo_count(user_page)
+      originals = original_repo_count(user_page)
       forked = all_projects - originals
-
-      ruby = user_page.css("ul.repo-stats").select{|li| li.text =~ /Ruby/}.count
-      js = user_page.css("ul.repo-stats").select{|li| li.text =~ /JavaScript/}.count
+      ruby = ruby_repo_count(user_page)
+      js = js_repo_count(user_page)
 
       @forking_authors << {
-        :fork_author => fork_author,
+        :fork_author  => fork_author,
         :all_projects => all_projects,
-        :originals => originals,
-        :forked => forked,
-        :ruby => ruby,
-        :js => js
-      }
+        :originals    => originals,
+        :forked       => forked,
+        :ruby         => ruby,
+        :js           => js }
     end
-
-    @forking_authors
   end
 
   private
@@ -68,6 +63,10 @@ class GithubRepo
     @repo_data = JSON.parse(content)
   end
 
+  def fetch_user_profile(author)
+    Nokogiri::HTML(open(GIT_USER_PROFILE_URL + author))
+  end
+
   def get_author_info(author)
     url = GIT_USER_INFO_URL + author
     content = open(url).read
@@ -79,11 +78,30 @@ class GithubRepo
     content = open(url).read
     JSON.parse(open(url).read)
   end
+
+  def js_repo_count(page)
+    page.css("ul.repo-stats").select{|li| li.text =~ /JavaScript/}.count
+  end
+
+  def original_repo_count(page)
+    page.css(".source").count
+  end
+
+  def public_repo_count(page)
+    page.css(".public").count
+  end
+
+  def ruby_repo_count(page)
+    page.css("ul.repo-stats").select{|li| li.text =~ /Ruby/}.count
+  end
 end
 
+# Command-Line Parsing
 ARGV.each do |input|
   repo = GithubRepo.new(input)
+
   repo.fork_authors.each do |forking_author|
+
     forking_author.each do |key, value|
       if key == "js"
         print value.to_s
@@ -91,6 +109,7 @@ ARGV.each do |input|
         print value.to_s + ", "
       end
     end
+
     puts
   end
 end
