@@ -10,6 +10,14 @@ GIT_API_URL = 'https://api.github.com/repos/'
 GIT_USER_INFO_URL = 'https://api.github.com/users/'
 GIT_USER_PROFILE_URL = 'https://github.com/'
 
+class Author
+  attr_accessor :name, :all_projects, :originals, :forked, :ruby, :js, :score
+
+  def initialize(author)
+    self.name = author
+  end
+end
+
 class Query
   def initialize(repository)
     repo = repository
@@ -25,26 +33,38 @@ class Query
     forks = get_fork_data(repo, author)
 
     @forking_authors = forks.collect do |fork|
-      create_author_hash(fork["owner"]["login"])
+      author_name = fork["owner"]["login"]
+      fork_author = Author.new(author_name)
+      make_author_hash(fork_author)
+      fork_author
     end
 
-    sort_authors
+    sort_the_authors(@forking_authors)
   end
 
   private
 
-  def create_author_hash(fork_author)
-    user_page = fetch_user_profile(fork_author)
+  def add_score_to_author(author)
+    score = author.originals * 3
+    score += author.ruby * 2
+    score += author.js * 2
+    score += author.forked * 1
 
-    author_hash = {
-      :fork_author  => fork_author,
-      :all_projects => public_repo_count(user_page),
-      :originals    => original_repo_count(user_page),
-      :forked       => forked_repo_count(user_page),
-      :ruby         => ruby_repo_count(user_page),
-      :js           => js_repo_count(user_page) }
+    author.score = score
+    author
+  end
 
-    score_author(author_hash)
+  def make_author_hash(fork_author)
+    user_page = fetch_user_profile(fork_author.name)
+
+    fork_author.all_projects = public_repo_count(user_page)
+    fork_author.originals    = original_repo_count(user_page)
+    fork_author.forked       = forked_repo_count(user_page)
+    fork_author.ruby         = ruby_repo_count(user_page)
+    fork_author.js           = js_repo_count(user_page)
+
+    add_score_to_author(fork_author)
+    fork_author
   end
 
   def determine_author(query)
@@ -96,18 +116,8 @@ class Query
     page.css("ul.repo-stats").select{|li| li.text =~ /Ruby/}.count
   end
 
-  def score_author(author)
-    score = author[:originals] * 3
-    score = author[:ruby] * 2
-    score = author[:js] * 2
-    score = author[:forked] * 1
-
-    author[:score] = score
-    author
-  end
-
-  def sort_authors
-    @forking_authors = @forking_authors.sort_by { |hsh| -hsh[:score] }
+  def sort_the_authors(array_of_objects)
+    array_of_objects.sort_by! { |obj| -obj.score }
   end
 end
 
@@ -116,20 +126,25 @@ end
 ARGV.each do |input|
   puts "Fetching data..."
   repo = Query.new(input)
+  headers = ["name", "all projects", "originals", "forked", "ruby", "js",
+    "score"]
 
-  repo.fork_authors.first.each do |key, value|
-    printf "%-13s", key
+  headers.each do |title|
+    printf "%-13s", title
   end
 
   puts
   85.times { print '=' }
   puts
 
-  repo.fork_authors.each do |forking_author|
-    forking_author.each do |key, value|
-      printf "%-13s", value.to_s
-    end
-
+  repo.fork_authors.each do |author|
+    printf "%-13s", author.name
+    printf "%-13s", author.all_projects
+    printf "%-13s", author.originals
+    printf "%-13s", author.forked
+    printf "%-13s", author.ruby
+    printf "%-13s", author.js
+    printf "%-13s", author.score
     puts
   end
 end
