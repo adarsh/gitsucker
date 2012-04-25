@@ -118,17 +118,13 @@ end
 # Command-Line Parsing
 ARGV.each do |input|
   repo = GithubRepo.new(input)
-  puts "Username/projects/original/forked/ruby/js/score!"
 
   repo.fork_authors.each do |forking_author|
-
     forking_author.each do |key, value|
-      print value.to_s
-      if key == :score
-        puts '!'
-      else
-        print ', '
-      end
+      # print value.to_s
+      printf "%-20s %s\n", key, value.to_s
     end
+
+    puts
   end
 end

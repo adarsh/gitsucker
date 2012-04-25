@@ -8,9 +8,8 @@ When /^I enter the github repo name$/ do
 end
 
 Then /^I should get the appropriate output$/ do
-  @output.should include("Username/projects/original/forked/ruby/js/score!")
-  @output.should include("mbleigh, 64, 36, 28, 51, 5, 28!")
-  @output.should include("donhill, 14, 1, 13, 6, 0, 13!")
-  @output.should include("garethrees, 33, 24, 9, 18, 3, 9!")
-  @output.should include("caozhzh, 9, 5, 4, 7, 0, 4!")
+  @output.should include("mbleigh")
+  @output.should include("donhill")
+  @output.should include("garethrees")
+  @output.should include("caozhzh")
 end
