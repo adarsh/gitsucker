@@ -111,23 +111,23 @@ end
 ARGV.each do |input|
   puts "Fetching data..."
   repo = Query.new(input)
-  headers = ["name", "all projects", "originals", "forked", "ruby", "js",
+  headers = ["all", "originals", "forked", "ruby", "js",
     "score"]
-
-  headers.each { |title| printf "%-13s", title }
+  printf "%-20s", "name"
+  headers.each { |title| printf "%-10s", title }
 
   puts
   85.times { print '=' }
   puts
 
   repo.fork_authors.each do |author|
-    printf "%-13s", author.name
-    printf "%-13s", author.all_projects
-    printf "%-13s", author.originals
-    printf "%-13s", author.forked
-    printf "%-13s", author.ruby
-    printf "%-13s", author.js
-    printf "%-13s", author.score
+    printf "%-20s", author.name
+    printf "%-10s", author.all_projects
+    printf "%-10s", author.originals
+    printf "%-10s", author.forked
+    printf "%-10s", author.ruby
+    printf "%-10s", author.js
+    printf "%-10s", author.score
     puts
   end
 end
