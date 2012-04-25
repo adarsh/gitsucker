@@ -109,25 +109,28 @@ end
 
 # Command-Line Parsing
 ARGV.each do |input|
-  puts "Fetching data..."
-  repo = Query.new(input)
-  headers = ["all", "originals", "forked", "ruby", "js",
-    "score"]
-  printf "%-20s", "name"
-  headers.each { |title| printf "%-10s", title }
+  begin
+    puts "Fetching data..."
+    repo = Query.new(input)
+    headers = ["all", "originals", "forked", "ruby", "js", "score"]
+    printf "%-20s", "name"
+    headers.each { |title| printf "%-10s", title }
 
-  puts
-  85.times { print '=' }
-  puts
-
-  repo.fork_authors.each do |author|
-    printf "%-20s", author.name
-    printf "%-10s", author.all_projects
-    printf "%-10s", author.originals
-    printf "%-10s", author.forked
-    printf "%-10s", author.ruby
-    printf "%-10s", author.js
-    printf "%-10s", author.score
     puts
+    80.times { print '=' }
+    puts
+
+    repo.fork_authors.each do |author|
+      printf "%-20s", author.name
+      printf "%-10s", author.all_projects
+      printf "%-10s", author.originals
+      printf "%-10s", author.forked
+      printf "%-10s", author.ruby
+      printf "%-10s", author.js
+      printf "%-10s", author.score
+      puts
+    end
+  rescue
+    puts "Repo not found."
   end
 end
