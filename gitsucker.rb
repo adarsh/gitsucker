@@ -50,6 +50,8 @@ class GithubRepo
       author_hash = score_author(author_hash)
       @forking_authors << author_hash
     end
+
+    sort_authors
   end
 
   private
@@ -99,24 +101,33 @@ class GithubRepo
   end
 
   def score_author(author)
-    author[:score] = "999"
+    score = author[:originals] * 3
+    score = author[:ruby] * 2
+    score = author[:js] * 2
+    score = author[:forked] * 1
+
+    author[:score] = score
     author
+  end
+
+  def sort_authors
+    @forking_authors = @forking_authors.sort_by { |hsh| -hsh[:score] }
   end
 end
 
 # Command-Line Parsing
 ARGV.each do |input|
   repo = GithubRepo.new(input)
-  puts "Username/projects/original/forked/ruby/js/score"
+  puts "Username/projects/original/forked/ruby/js/score!"
 
   repo.fork_authors.each do |forking_author|
 
     forking_author.each do |key, value|
       print value.to_s
       if key == :score
-        puts
+        puts '!'
       else
-        print ", "
+        print ', '
       end
     end
   end
