@@ -26,28 +26,8 @@ class GithubRepo
   def get_forking_authors(repo, author)
     forks = get_fork_data(repo, author)
 
-    @forking_authors = []
-
-    forks.each do |fork|
-      fork_author = fork["owner"]["login"]
-      user_page = fetch_user_profile(fork_author)
-
-      all_projects = public_repo_count(user_page)
-      originals = original_repo_count(user_page)
-      forked = all_projects - originals
-      ruby = ruby_repo_count(user_page)
-      js = js_repo_count(user_page)
-
-      author_hash = {
-        :fork_author  => fork_author,
-        :all_projects => all_projects,
-        :originals    => originals,
-        :forked       => forked,
-        :ruby         => ruby,
-        :js           => js }
-
-      author_hash = score_author(author_hash)
-      @forking_authors << author_hash
+    @forking_authors = forks.collect do |fork|
+      create_author_hash(fork["owner"]["login"])
     end
 
     sort_authors
@@ -55,11 +35,25 @@ class GithubRepo
 
   private
 
+  def create_author_hash(fork_author)
+    user_page = fetch_user_profile(fork_author)
+
+    author_hash = {
+      :fork_author  => fork_author,
+      :all_projects => public_repo_count(user_page),
+      :originals    => original_repo_count(user_page),
+      :forked       => forked_repo_count(user_page),
+      :ruby         => ruby_repo_count(user_page),
+      :js           => js_repo_count(user_page) }
+
+    score_author(author_hash)
+  end
+
   def determine_author(query)
     url = GIT_REPO_SEARCH_URL + query
     content = open(url).read
     results = JSON.parse(content)
-    first_search_result_username = results["repositories"].first["username"].to_s
+    first_search_result_username = results["repositories"].first["username"]
   end
 
   def fetch_repo_data(repo, author)
@@ -70,6 +64,10 @@ class GithubRepo
 
   def fetch_user_profile(author)
     Nokogiri::HTML(open(GIT_USER_PROFILE_URL + author))
+  end
+
+  def forked_repo_count(page)
+    public_repo_count(page) - original_repo_count(page)
   end
 
   def get_author_info(author)
@@ -117,6 +115,7 @@ end
 
 # Command-Line Parsing
 ARGV.each do |input|
+  puts "Fetching data..."
   repo = GithubRepo.new(input)
 
   repo.fork_authors.each do |forking_author|
