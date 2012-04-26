@@ -19,14 +19,10 @@ class Author
 end
 
 class Query
-  def initialize(repository)
-    repo = repository
+  attr_accessor :forking_authors
+  def initialize(repo)
     author = determine_author(repo)
     get_forking_authors(repo, author)
-  end
-
-  def fork_authors
-    @forking_authors
   end
 
   private
@@ -120,7 +116,7 @@ ARGV.each do |input|
     80.times { print '=' }
     puts
 
-    repo.fork_authors.each do |author|
+    repo.forking_authors.each do |author|
       printf "%-20s", author.name
       printf "%-10s", author.all_projects
       printf "%-10s", author.originals
