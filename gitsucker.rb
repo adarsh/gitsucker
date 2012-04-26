@@ -109,22 +109,17 @@ ARGV.each do |input|
     puts "Fetching data..."
     query = Query.new(input)
 
-    headers = ["all", "originals", "forked", "ruby", "js", "score"]
-    printf "%-20s", "name"
-    headers.each { |title| printf "%-10s", title }
+    printf "%-20s %-10s %-10s %-10s %-10s %-10s %-10s",
+      "name", "all", "originals", "forked", "ruby", "js", "score"
 
     puts
     print '='*80
     puts
 
     query.forking_authors.each do |author|
-      printf "%-20s", author.name
-      printf "%-10s", author.all_projects
-      printf "%-10s", author.originals
-      printf "%-10s", author.forked
-      printf "%-10s", author.ruby
-      printf "%-10s", author.js
-      printf "%-10s", author.score
+      printf "%-20s %-10s %-10s %-10s %-10s %-10s %-10s",
+        author.name, author.all_projects, author.originals, author.forked,
+        author.ruby, author.js, author.score
       puts
     end
   rescue
