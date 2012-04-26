@@ -105,18 +105,16 @@ ARGV.each do |input|
     puts "Fetching data..."
     forking_authors = Query.new(input).get_forking_authors
 
-    printf "%-20s %-10s %-10s %-10s %-10s %-10s %-10s",
-      "name", "all", "originals", "forked", "ruby", "js", "score"
+    puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" %
+      ["name", "all", "originals", "forked", "ruby", "js", "score"]
 
-    puts
     print '='*80
     puts
 
     forking_authors.each do |author|
-      printf "%-20s %-10s %-10s %-10s %-10s %-10s %-10s",
-        author.name, author.all_projects, author.originals, author.forked,
-        author.ruby, author.js, author.score
-      puts
+      puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" %
+        [author.name, author.all_projects, author.originals, author.forked,
+        author.ruby, author.js, author.score]
     end
   # rescue
     # puts "Repo not found."
