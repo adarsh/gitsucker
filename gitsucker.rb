@@ -67,29 +67,28 @@ end
 class Query
   attr_accessor :forking_authors
 
-  def initialize(repo)
-    author = determine_author(repo)
-    get_forking_authors(repo, author)
+  def initialize(repo_query)
+    @repo_query = repo_query
   end
 
-  private
-
-  def determine_author(query)
-    url = GIT_REPO_SEARCH_URL + query
-    results = JSON.parse(open(url).read)
-    results["repositories"].first["username"]
-  end
-
-  def get_forking_authors(repo, author)
-    forks = get_fork_data(repo, author)
+  def get_forking_authors
+    forks = get_fork_data(@repo_query,
+                          search_author_using_repo_query(@repo_query))
 
     @forking_authors = forks.collect do |fork|
-      author_name = fork["owner"]["login"]
-      fork_author = Author.new(author_name)
+      fork_author = Author.new(fork["owner"]["login"])
       fork_author
     end
 
     sort_authors_by_score(@forking_authors)
+  end
+
+  private
+
+  def search_author_using_repo_query(query)
+    url = GIT_REPO_SEARCH_URL + query
+    results = JSON.parse(open(url).read)
+    results["repositories"].first["username"]
   end
 
   def get_fork_data(repo, author)
@@ -108,7 +107,7 @@ end
 ARGV.each do |input|
   # begin
     puts "Fetching data..."
-    query = Query.new(input)
+    forking_authors = Query.new(input).get_forking_authors
 
     printf "%-20s %-10s %-10s %-10s %-10s %-10s %-10s",
       "name", "all", "originals", "forked", "ruby", "js", "score"
@@ -117,7 +116,7 @@ ARGV.each do |input|
     print '='*80
     puts
 
-    query.forking_authors.each do |author|
+    forking_authors.each do |author|
       printf "%-20s %-10s %-10s %-10s %-10s %-10s %-10s",
         author.name, author.all_projects, author.originals, author.forked,
         author.ruby, author.js, author.score
