@@ -10,6 +10,39 @@ GIT_API_URL = 'https://api.github.com/repos/'
 GIT_USER_INFO_URL = 'https://api.github.com/users/'
 GIT_USER_PROFILE_URL = 'https://github.com/'
 
+class Query
+  attr_accessor :forking_authors
+
+  def initialize(repo_query)
+    @repo_query = repo_query
+  end
+
+  def get_forking_authors
+    collect_authors_array(get_all_forks_for_repo(@repo_query))
+  end
+
+  private
+
+  def get_all_forks_for_repo(repo)
+    author = get_author_using_repo_query(@repo_query)
+    JSON.parse(open(GIT_API_URL + author + "/" + repo + "/forks").read)
+  end
+
+  def get_author_using_repo_query(query)
+    results = JSON.parse(open(GIT_REPO_SEARCH_URL + query).read)
+    results["repositories"].first["username"]
+  end
+
+  def collect_authors_array(forks)
+    forking_authors = forks.collect { |fork| Author.new(fork["owner"]["login"]) }
+    sort_authors_by_score(forking_authors)
+  end
+
+  def sort_authors_by_score(array_of_authors)
+    array_of_authors.sort_by! { |a| -a.score }
+  end
+end
+
 class Author
   attr_accessor :name, :all_projects, :originals, :forked, :ruby, :js, :score
 
@@ -63,45 +96,6 @@ class Author
     author.score = score
   end
 end
-
-class Query
-  attr_accessor :forking_authors
-
-  def initialize(repo_query)
-    @repo_query = repo_query
-  end
-
-  def get_forking_authors
-    forks = get_fork_data(@repo_query,
-                          search_author_using_repo_query(@repo_query))
-
-    @forking_authors = forks.collect do |fork|
-      fork_author = Author.new(fork["owner"]["login"])
-      fork_author
-    end
-
-    sort_authors_by_score(@forking_authors)
-  end
-
-  private
-
-  def search_author_using_repo_query(query)
-    url = GIT_REPO_SEARCH_URL + query
-    results = JSON.parse(open(url).read)
-    results["repositories"].first["username"]
-  end
-
-  def get_fork_data(repo, author)
-    url = GIT_API_URL + author + "/" + repo + "/forks"
-    content = open(url).read
-    JSON.parse(open(url).read)
-  end
-
-  def sort_authors_by_score(array_of_objects)
-    array_of_objects.sort_by! { |obj| -obj.score }
-  end
-end
-
 
 # Command-Line Parsing
 ARGV.each do |input|
