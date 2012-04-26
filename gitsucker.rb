@@ -18,24 +18,24 @@ class Query
   end
 
   def get_forking_authors
-    collect_authors_array(get_all_forks_for_repo(@repo_query))
+    create_array_of_authors
   end
 
   private
 
-  def get_all_forks_for_repo(repo)
-    author = get_author_using_repo_query(@repo_query)
-    JSON.parse(open(GIT_API_URL + author + "/" + repo + "/forks").read)
+  # Add this to Fork/Repo class
+  def get_all_forks_for_repo
+    author = get_author_using_repo_query
+    JSON.parse(open(GIT_API_URL + author + "/" + @repo_query + "/forks").read)
   end
 
-  def get_author_using_repo_query(query)
-    results = JSON.parse(open(GIT_REPO_SEARCH_URL + query).read)
+  def get_author_using_repo_query
+    results = JSON.parse(open(GIT_REPO_SEARCH_URL + @repo_query).read)
     results["repositories"].first["username"]
   end
 
-  def collect_authors_array(forks)
-    forking_authors = forks.collect { |fork| Author.new(fork["owner"]["login"]) }
-    sort_authors_by_score(forking_authors)
+  def create_array_of_authors
+    sort_authors_by_score(forking_authors = get_all_forks_for_repo.collect { |fork| Author.new(fork["owner"]["login"]) })
   end
 
   def sort_authors_by_score(array_of_authors)
