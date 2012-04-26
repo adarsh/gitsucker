@@ -63,6 +63,8 @@ class Author
     add_score_to_author(self)
   end
 
+  private
+
   def fetch_user_profile(author)
     Nokogiri::HTML(open(GIT_USER_PROFILE_URL + author))
   end
