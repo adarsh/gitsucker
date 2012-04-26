@@ -15,28 +15,43 @@ class Author
 
   def initialize(author)
     self.name = author
-  end
-end
-
-class Query
-  attr_accessor :forking_authors
-  def initialize(repo)
-    author = determine_author(repo)
-    get_forking_authors(repo, author)
+    self.add_author_attributes
   end
 
-  private
+  def add_author_attributes
+    user_page = fetch_user_profile(self.name)
 
-  def add_author_attributes(fork_author)
-    user_page = fetch_user_profile(fork_author.name)
+    self.all_projects = public_repo_count(user_page)
+    self.originals    = original_repo_count(user_page)
+    self.forked       = forked_repo_count(user_page)
+    self.ruby         = ruby_repo_count(user_page)
+    self.js           = js_repo_count(user_page)
 
-    fork_author.all_projects = public_repo_count(user_page)
-    fork_author.originals    = original_repo_count(user_page)
-    fork_author.forked       = forked_repo_count(user_page)
-    fork_author.ruby         = ruby_repo_count(user_page)
-    fork_author.js           = js_repo_count(user_page)
+    add_score_to_author(self)
+  end
 
-    add_score_to_author(fork_author)
+  def fetch_user_profile(author)
+    Nokogiri::HTML(open(GIT_USER_PROFILE_URL + author))
+  end
+
+  def public_repo_count(page)
+    page.css(".public").count
+  end
+
+  def original_repo_count(page)
+    page.css(".source").count
+  end
+
+  def forked_repo_count(page)
+    public_repo_count(page) - original_repo_count(page)
+  end
+
+  def ruby_repo_count(page)
+    page.css("ul.repo-stats").select{|li| li.text =~ /Ruby/}.count
+  end
+
+  def js_repo_count(page)
+    page.css("ul.repo-stats").select{|li| li.text =~ /JavaScript/}.count
   end
 
   def add_score_to_author(author)
@@ -47,25 +62,22 @@ class Query
 
     author.score = score
   end
+end
+
+class Query
+  attr_accessor :forking_authors
+
+  def initialize(repo)
+    author = determine_author(repo)
+    get_forking_authors(repo, author)
+  end
+
+  private
 
   def determine_author(query)
     url = GIT_REPO_SEARCH_URL + query
     results = JSON.parse(open(url).read)
     results["repositories"].first["username"]
-  end
-
-  def fetch_user_profile(author)
-    Nokogiri::HTML(open(GIT_USER_PROFILE_URL + author))
-  end
-
-  def forked_repo_count(page)
-    public_repo_count(page) - original_repo_count(page)
-  end
-
-  def get_fork_data(repo, author)
-    url = GIT_API_URL + author + "/" + repo + "/forks"
-    content = open(url).read
-    JSON.parse(open(url).read)
   end
 
   def get_forking_authors(repo, author)
@@ -74,27 +86,16 @@ class Query
     @forking_authors = forks.collect do |fork|
       author_name = fork["owner"]["login"]
       fork_author = Author.new(author_name)
-      add_author_attributes(fork_author)
       fork_author
     end
 
     sort_authors_by_score(@forking_authors)
   end
 
-  def js_repo_count(page)
-    page.css("ul.repo-stats").select{|li| li.text =~ /JavaScript/}.count
-  end
-
-  def original_repo_count(page)
-    page.css(".source").count
-  end
-
-  def public_repo_count(page)
-    page.css(".public").count
-  end
-
-  def ruby_repo_count(page)
-    page.css("ul.repo-stats").select{|li| li.text =~ /Ruby/}.count
+  def get_fork_data(repo, author)
+    url = GIT_API_URL + author + "/" + repo + "/forks"
+    content = open(url).read
+    JSON.parse(open(url).read)
   end
 
   def sort_authors_by_score(array_of_objects)
@@ -105,7 +106,7 @@ end
 
 # Command-Line Parsing
 ARGV.each do |input|
-  begin
+  # begin
     puts "Fetching data..."
     query = Query.new(input)
 
@@ -122,7 +123,7 @@ ARGV.each do |input|
         author.ruby, author.js, author.score
       puts
     end
-  rescue
-    puts "Repo not found."
-  end
+  # rescue
+    # puts "Repo not found."
+  # end
 end
