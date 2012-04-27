@@ -1,45 +1,47 @@
 #!/usr/bin/env ruby
-# Libraries
 require 'open-uri'
 require 'nokogiri'
 require 'json'
 
-# Constants
-GIT_REPO_SEARCH_URL = 'https://api.github.com/legacy/repos/search/'
-GIT_API_URL = 'https://api.github.com/repos/'
-GIT_USER_INFO_URL = 'https://api.github.com/users/'
 GIT_USER_PROFILE_URL = 'https://github.com/'
 
-class Query
+class Repo
   attr_accessor :forking_authors
 
-  def initialize(repo_query)
-    @repo_query = repo_query
+  def initialize(name)
+    @name = name
   end
 
   def get_forking_authors
-    create_array_of_authors
+    create_array_of_authors(get_all_forks_for_repo)
   end
 
   private
 
-  # Add this to Fork/Repo class
+  def create_array_of_authors(forks)
+    get_all_forks_for_repo
+    forking_authors = forks.collect { |fork| Author.new(fork["owner"]["login"]) }
+    sort_authors_by_score(forking_authors)
+  end
+
   def get_all_forks_for_repo
-    author = get_author_using_repo_query
-    JSON.parse(open(GIT_API_URL + author + "/" + @repo_query + "/forks").read)
-  end
-
-  def get_author_using_repo_query
-    results = JSON.parse(open(GIT_REPO_SEARCH_URL + @repo_query).read)
-    results["repositories"].first["username"]
-  end
-
-  def create_array_of_authors
-    sort_authors_by_score(forking_authors = get_all_forks_for_repo.collect { |fork| Author.new(fork["owner"]["login"]) })
+    JSON.parse(open(author_url).read)
   end
 
   def sort_authors_by_score(array_of_authors)
-    array_of_authors.sort_by! { |a| -a.score }
+    array_of_authors.sort_by! { |a| a.score }.reverse
+  end
+
+  def author_url
+    'https://api.github.com/repos/' + author + "/" + @name + "/forks"
+  end
+
+  def search_url
+    'https://api.github.com/legacy/repos/search/' + @name
+  end
+
+  def author
+    JSON.parse(open(search_url).read)["repositories"].first["username"]
   end
 end
 
@@ -103,7 +105,7 @@ end
 ARGV.each do |input|
   # begin
     puts "Fetching data..."
-    forking_authors = Query.new(input).get_forking_authors
+    forking_authors = Repo.new(input).get_forking_authors
 
     puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" %
       ["name", "all", "originals", "forked", "ruby", "js", "score"]
