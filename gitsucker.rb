@@ -68,7 +68,7 @@ class Author
   private
 
   def github_profile
-    Nokogiri::HTML(open('https://github.com/' + @name))
+    @github_profile ||= Nokogiri::HTML(open('https://github.com/' + @name))
   end
 
   def public_repo_count
