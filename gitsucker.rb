@@ -4,8 +4,6 @@ require 'nokogiri'
 require 'json'
 require 'awesome_print'
 
-GIT_USER_PROFILE_URL = 'https://github.com/'
-
 class Repo
   attr_accessor :forking_authors
 
@@ -63,30 +61,34 @@ class Author
     ]
   end
 
+  def self.stat_types
+    ["name", "all", "originals", "forked", "ruby", "js", "score"]
+  end
+
   private
 
   def github_profile
-    Nokogiri::HTML(open(GIT_USER_PROFILE_URL + @name))
+    Nokogiri::HTML(open('https://github.com/' + @name))
   end
 
   def public_repo_count
-    github_profile.css(".public").count
+    @public_count ||= github_profile.css(".public").count
   end
 
   def original_repo_count
-    github_profile.css(".source").count
+    @original ||= github_profile.css(".source").count
   end
 
   def forked_repo_count
-    public_repo_count - original_repo_count
+    @forked ||= public_repo_count - original_repo_count
   end
 
   def ruby_repo_count
-    github_profile.css("ul.repo-stats").select{|li| li.text =~ /Ruby/}.count
+    @ruby ||= github_profile.css("ul.repo-stats").select{|li| li.text =~ /Ruby/}.count
   end
 
   def js_repo_count
-    github_profile.css("ul.repo-stats").select{|li| li.text =~ /JavaScript/}.count
+    @js ||= github_profile.css("ul.repo-stats").select{|li| li.text =~ /JavaScript/}.count
   end
 end
 
@@ -94,13 +96,12 @@ end
 ARGV.each do |input|
   # begin
     puts "Fetching data..."
-    puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" %
-      ["name", "all", "originals", "forked", "ruby", "js", "score"]
+    forking_authors = Repo.new(input).get_forking_authors
+    puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" % Author.stat_types
 
     print '='*80
     puts
 
-    forking_authors = Repo.new(input).get_forking_authors
     forking_authors.each do |author|
       puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" % author.stats
     end
