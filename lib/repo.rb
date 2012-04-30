@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 class Repo
   attr_accessor :forking_authors
 
