@@ -62,7 +62,7 @@ class Author
   end
 
   def self.stat_types
-    ["name", "all", "originals", "forked", "ruby", "js", "score"]
+    %w(name all originals forked ruby js score)
   end
 
   private
@@ -94,18 +94,17 @@ end
 
 # Command-Line Parsing
 ARGV.each do |input|
-  # begin
+  begin
     puts "Fetching data..."
-    forking_authors = Repo.new(input).get_forking_authors
     puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" % Author.stat_types
 
     print '='*80
     puts
 
-    forking_authors.each do |author|
+    Repo.new(input).get_forking_authors.each do |author|
       puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" % author.stats
     end
-  # rescue
-    # puts "Repo not found."
-  # end
+  rescue
+    puts "Repo not found."
+  end
 end
