@@ -40,7 +40,6 @@ class Repo
 end
 
 class Author
-  attr_accessor :name, :all_projects, :originals, :forked, :ruby, :js, :score
   attr_reader :score
 
   def initialize(name)
@@ -50,17 +49,18 @@ class Author
     @score += ruby_repo_count * 2
     @score += js_repo_count * 2
     @score += forked_repo_count * 1
-
-    self.add_author_attributes
   end
 
-  def add_author_attributes
-
-    self.all_projects = public_repo_count
-    self.originals    = original_repo_count
-    self.forked       = forked_repo_count
-    self.ruby         = ruby_repo_count
-    self.js           = js_repo_count
+  def stats
+    [
+      @name,
+      public_repo_count,
+      original_repo_count,
+      forked_repo_count,
+      ruby_repo_count,
+      js_repo_count,
+      @score
+    ]
   end
 
   private
@@ -102,9 +102,7 @@ ARGV.each do |input|
 
     forking_authors = Repo.new(input).get_forking_authors
     forking_authors.each do |author|
-      puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" %
-        [author.name, author.all_projects, author.originals, author.forked,
-        author.ruby, author.js, author.score]
+      puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" % author.stats
     end
   # rescue
     # puts "Repo not found."
