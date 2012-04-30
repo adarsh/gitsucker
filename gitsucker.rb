@@ -39,12 +39,14 @@ end
 class Author
   attr_reader :score
 
+  ORIGINAL_REPO_VALUE = 3
+  RUBY_REPO_VALUE = 2
+  JS_REPO_VALUE = 2
+  FORKED_REPO_VALUE = 1
+
   def initialize(name)
     @name = name
-    @score = original_repo_count * 3
-    @score += ruby_repo_count * 2
-    @score += js_repo_count * 2
-    @score += forked_repo_count * 1
+    @score = user_score
   end
 
   def stats
@@ -87,6 +89,13 @@ class Author
 
   def ruby_repo_count
     @ruby ||= github_profile.css('ul.repo-stats').select{|li| li.text =~ /Ruby/}.count
+  end
+
+  def user_score
+    score = original_repo_count * ORIGINAL_REPO_VALUE
+    score += ruby_repo_count * RUBY_REPO_VALUE
+    score += js_repo_count * JS_REPO_VALUE
+    score += forked_repo_count * FORKED_REPO_VALUE
   end
 end
 
