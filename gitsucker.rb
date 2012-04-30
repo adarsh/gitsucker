@@ -41,57 +41,52 @@ end
 
 class Author
   attr_accessor :name, :all_projects, :originals, :forked, :ruby, :js, :score
+  attr_reader :score
 
   def initialize(name)
-    self.name = name
+    @name = name
+
+    @score = original_repo_count * 3
+    @score += ruby_repo_count * 2
+    @score += js_repo_count * 2
+    @score += forked_repo_count * 1
+
     self.add_author_attributes
   end
 
   def add_author_attributes
-    user_page = fetch_user_profile(self.name)
 
-    self.all_projects = public_repo_count(user_page)
-    self.originals    = original_repo_count(user_page)
-    self.forked       = forked_repo_count(user_page)
-    self.ruby         = ruby_repo_count(user_page)
-    self.js           = js_repo_count(user_page)
-
-    add_score_to_author(self)
+    self.all_projects = public_repo_count
+    self.originals    = original_repo_count
+    self.forked       = forked_repo_count
+    self.ruby         = ruby_repo_count
+    self.js           = js_repo_count
   end
 
   private
 
-  def fetch_user_profile(author)
-    Nokogiri::HTML(open(GIT_USER_PROFILE_URL + author))
+  def github_profile
+    Nokogiri::HTML(open(GIT_USER_PROFILE_URL + @name))
   end
 
-  def public_repo_count(page)
-    page.css(".public").count
+  def public_repo_count
+    github_profile.css(".public").count
   end
 
-  def original_repo_count(page)
-    page.css(".source").count
+  def original_repo_count
+    github_profile.css(".source").count
   end
 
-  def forked_repo_count(page)
-    public_repo_count(page) - original_repo_count(page)
+  def forked_repo_count
+    public_repo_count - original_repo_count
   end
 
-  def ruby_repo_count(page)
-    page.css("ul.repo-stats").select{|li| li.text =~ /Ruby/}.count
+  def ruby_repo_count
+    github_profile.css("ul.repo-stats").select{|li| li.text =~ /Ruby/}.count
   end
 
-  def js_repo_count(page)
-    page.css("ul.repo-stats").select{|li| li.text =~ /JavaScript/}.count
-  end
-
-  def add_score_to_author(author)
-    score = author.originals * 3
-    score += author.ruby * 2
-    score += author.js * 2
-    score += author.forked * 1
-
-    author.score = score
+  def js_repo_count
+    github_profile.css("ul.repo-stats").select{|li| li.text =~ /JavaScript/}.count
   end
 end
 
@@ -99,14 +94,13 @@ end
 ARGV.each do |input|
   # begin
     puts "Fetching data..."
-    forking_authors = Repo.new(input).get_forking_authors
-
     puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" %
       ["name", "all", "originals", "forked", "ruby", "js", "score"]
 
     print '='*80
     puts
 
+    forking_authors = Repo.new(input).get_forking_authors
     forking_authors.each do |author|
       puts "%-20s %-10s %-10s %-10s %-10s %-10s %-10s" %
         [author.name, author.all_projects, author.originals, author.forked,
