@@ -2,6 +2,7 @@
 require 'open-uri'
 require 'nokogiri'
 require 'json'
+require 'awesome_print'
 
 GIT_USER_PROFILE_URL = 'https://github.com/'
 
@@ -13,23 +14,16 @@ class Repo
   end
 
   def get_forking_authors
-    create_array_of_authors(get_all_forks_for_repo)
+    fork_authors.
+      map { |name| Author.new(name) }.
+      sort_by { |author| author.score }.
+      reverse
   end
 
   private
 
-  def create_array_of_authors(forks)
-    get_all_forks_for_repo
-    forking_authors = forks.collect { |fork| Author.new(fork["owner"]["login"]) }
-    sort_authors_by_score(forking_authors)
-  end
-
-  def get_all_forks_for_repo
-    JSON.parse(open(author_url).read)
-  end
-
-  def sort_authors_by_score(array_of_authors)
-    array_of_authors.sort_by! { |a| a.score }.reverse
+  def fork_authors
+    JSON.parse(open(author_url).read).map { |fork| fork["owner"]["login"] }
   end
 
   def author_url
@@ -48,8 +42,8 @@ end
 class Author
   attr_accessor :name, :all_projects, :originals, :forked, :ruby, :js, :score
 
-  def initialize(author)
-    self.name = author
+  def initialize(name)
+    self.name = name
     self.add_author_attributes
   end
 
