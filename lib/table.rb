@@ -21,7 +21,15 @@ class Table
 
   def display_author_stats
     Repo.new(@repo_name).forking_authors.each do |author|
-      puts column_spacing % author.stats
+      printf column_spacing,
+        author.name,
+        author.public_repo_count,
+        author.original_repo_count,
+        author.forked_repo_count,
+        author.ruby_repo_count,
+        author.js_repo_count,
+        author.score
+      puts
     end
   end
 

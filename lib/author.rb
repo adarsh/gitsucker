@@ -3,34 +3,15 @@ require 'nokogiri'
 class Author
   STAT_TYPES = %w(name all originals forked ruby js score)
 
-  attr_reader :score
+  attr_reader :name, :score
 
   def initialize(name)
     @name = name
     @score = user_score
   end
 
-  def stats
-    [
-      @name,
-      public_repo_count,
-      original_repo_count,
-      forked_repo_count,
-      ruby_repo_count,
-      js_repo_count,
-      @score
-    ]
-  end
-
-
-  private
-
   def forked_repo_count
     @forked ||= public_repo_count - original_repo_count
-  end
-
-  def github_profile
-    @github_profile ||= Nokogiri::HTML(open('https://github.com/' + @name))
   end
 
   def js_repo_count
@@ -47,6 +28,12 @@ class Author
 
   def ruby_repo_count
     @ruby ||= github_profile.css('ul.repo-stats').select{|li| li.text =~ /Ruby/}.count
+  end
+
+  private
+
+  def github_profile
+    @github_profile ||= Nokogiri::HTML(open('https://github.com/' + @name))
   end
 
   def user_score
