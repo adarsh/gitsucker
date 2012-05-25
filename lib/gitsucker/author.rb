@@ -1,5 +1,3 @@
-require 'nokogiri'
-
 class Author
   STAT_TYPES = %w(name all originals forked ruby js score)
 
