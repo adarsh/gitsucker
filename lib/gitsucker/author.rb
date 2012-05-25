@@ -12,30 +12,26 @@ module Gitsucker
       scorer.score
     end
 
+    def original_repo_count
+      github_profile.original_repo_count
+    end
+
     def forked_repo_count
-      @forked ||= public_repo_count - original_repo_count
+      github_profile.forked_repo_count
     end
 
     def js_repo_count
-      @js ||= github_profile.css('ul.repo-stats').select{|li| li.text =~ /JavaScript/}.count
-    end
-
-    def original_repo_count
-      @original ||= github_profile.css('.source').count
-    end
-
-    def public_repo_count
-      @public_count ||= github_profile.css('.public').count
+      github_profile.js_repo_count
     end
 
     def ruby_repo_count
-      @ruby ||= github_profile.css('ul.repo-stats').select{|li| li.text =~ /Ruby/}.count
+      github_profile.ruby_repo_count
     end
 
     private
 
     def github_profile
-      @github_profile ||= Nokogiri::HTML(open('https://github.com/' + @name))
+      GithubProfile.new(@name)
     end
 
     def scorer
