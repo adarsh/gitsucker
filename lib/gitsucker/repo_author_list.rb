@@ -5,7 +5,7 @@ module Gitsucker
     end
 
     def authors
-      @authors ||= author_names.map { Author.new(name) }
+      @authors ||= author_names.map { |author_name| Author.new(author_name) }
     end
 
     private

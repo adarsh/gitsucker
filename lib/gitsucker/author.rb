@@ -28,6 +28,14 @@ module Gitsucker
       github_profile.ruby_repo_count
     end
 
+    def ==(other)
+      if other.is_a?(Author)
+        name == other.name
+      else
+        super
+      end
+    end
+
     private
 
     def github_profile
