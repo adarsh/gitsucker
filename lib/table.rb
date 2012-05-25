@@ -1,6 +1,6 @@
 class Table
-  def initialize(input)
-    @input = input
+  def initialize(repo_name)
+    @repo_name = repo_name
   end
 
   def output_results
@@ -20,7 +20,7 @@ class Table
   end
 
   def display_author_stats
-    Repo.new(@input).forking_authors.each do |author|
+    Repo.new(@repo_name).forking_authors.each do |author|
       puts column_spacing % author.stats
     end
   end

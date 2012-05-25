@@ -11,7 +11,7 @@ RUBY_REPO_VALUE = 2
 JS_REPO_VALUE = 2
 FORKED_REPO_VALUE = 1
 
-ARGV.each do |input|
-  table = Table.new(input)
+ARGV.each do |repo_name|
+  table = Table.new(repo_name)
   table.output_results
 end
