@@ -26,7 +26,7 @@ class Table
   end
 
   def display_header
-    puts column_spacing % Author.stat_types
+    puts column_spacing % Author::STAT_TYPES
     puts '='*80
   end
 end

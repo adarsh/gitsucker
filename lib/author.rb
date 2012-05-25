@@ -1,6 +1,8 @@
 require 'nokogiri'
 
 class Author
+  STAT_TYPES = %w(name all originals forked ruby js score)
+
   attr_reader :score
 
   def initialize(name)
@@ -20,9 +22,6 @@ class Author
     ]
   end
 
-  def self.stat_types
-    %w(name all originals forked ruby js score)
-  end
 
   private
 
