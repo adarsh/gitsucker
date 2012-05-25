@@ -1,7 +1,6 @@
 class Repo
   def initialize(name)
-    @name = name
-    @repo_author_list = RepoAuthorList.new(@name)
+    @repo_author_list = RepoAuthorList.new(name)
   end
 
   def forking_authors
