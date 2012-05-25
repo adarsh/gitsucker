@@ -27,7 +27,7 @@ describe Gitsucker::Author, '#==' do
   end
 end
 
-%w(original_repo_count forked_repo_count js_repo_count ruby_repo_count).each do |method_name|
+%w(public_repo_count forked_repo_count js_repo_count ruby_repo_count original_repo_count).each do |method_name|
   describe Gitsucker::Author, "##{method_name}" do
     it 'delegates to the github profile' do
       author = Gitsucker::Author.new('name')

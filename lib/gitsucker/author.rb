@@ -16,6 +16,10 @@ module Gitsucker
       github_profile.original_repo_count
     end
 
+    def public_repo_count
+      github_profile.public_repo_count
+    end
+
     def forked_repo_count
       github_profile.forked_repo_count
     end
