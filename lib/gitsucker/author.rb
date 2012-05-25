@@ -2,11 +2,14 @@ module Gitsucker
   class Author
     STAT_TYPES = %w(name all originals forked ruby js score)
 
-    attr_reader :name, :score
+    attr_reader :name
 
     def initialize(name)
       @name = name
-      @score = user_score
+    end
+
+    def score
+      scorer.score
     end
 
     def forked_repo_count
@@ -35,11 +38,8 @@ module Gitsucker
       @github_profile ||= Nokogiri::HTML(open('https://github.com/' + @name))
     end
 
-    def user_score
-      score = original_repo_count * ORIGINAL_REPO_VALUE
-      score += ruby_repo_count * RUBY_REPO_VALUE
-      score += js_repo_count * JS_REPO_VALUE
-      score += forked_repo_count * FORKED_REPO_VALUE
+    def scorer
+      Scorer.new(original_repo_count, ruby_repo_count, js_repo_count, forked_repo_count)
     end
   end
 end
