@@ -20,7 +20,7 @@ class Table
   end
 
   def display_author_stats
-    Repo.new(@input).get_forking_authors.each do |author|
+    Repo.new(@input).forking_authors.each do |author|
       puts column_spacing % author.stats
     end
   end

@@ -4,6 +4,7 @@ require 'json'
 require './lib/author'
 require './lib/repo'
 require './lib/table'
+require './lib/repo_author_list'
 
 ORIGINAL_REPO_VALUE = 3
 RUBY_REPO_VALUE = 2
