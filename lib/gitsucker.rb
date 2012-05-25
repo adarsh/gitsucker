@@ -8,7 +8,9 @@ require_path = File.dirname(File.expand_path(__FILE__))
   require require_path + "/gitsucker/#{file}"
 end
 
-ORIGINAL_REPO_VALUE = 3
-RUBY_REPO_VALUE = 2
-JS_REPO_VALUE = 2
-FORKED_REPO_VALUE = 1
+module Gitsucker
+  ORIGINAL_REPO_VALUE = 3
+  RUBY_REPO_VALUE = 2
+  JS_REPO_VALUE = 2
+  FORKED_REPO_VALUE = 1
+end
