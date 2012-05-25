@@ -3,6 +3,9 @@ GEM
   specs:
     diff-lcs (1.1.3)
     json (1.7.3)
+    metaclass (0.0.1)
+    mocha (0.10.5)
+      metaclass (~> 0.0.1)
     nokogiri (1.5.2)
     rspec (2.9.0)
       rspec-core (~> 2.9.0)
@@ -18,5 +21,6 @@ PLATFORMS
 
 DEPENDENCIES
   json
+  mocha
   nokogiri
   rspec (~> 2.9.0)
