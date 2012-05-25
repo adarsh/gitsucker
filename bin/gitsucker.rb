@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require_relative File.expand_path('../lib/gitsucker', __FILE__)
+require File.expand_path('../../lib/gitsucker', __FILE__)
 
 ARGV.each do |repo_name|
   table = Gitsucker::Table.new(repo_name)
