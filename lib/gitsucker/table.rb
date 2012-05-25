@@ -1,7 +1,8 @@
 module Gitsucker
   class Table
-    def initialize(repo_name)
+    def initialize(repo_name, output = STDOUT)
       @repo_name = repo_name
+      @output = output
     end
 
     def output_results
@@ -22,7 +23,7 @@ module Gitsucker
 
     def display_author_stats
       Repo.new(@repo_name).forking_authors.each do |author|
-        printf column_spacing,
+        @output.printf column_spacing,
           author.name,
           author.public_repo_count,
           author.original_repo_count,
@@ -30,13 +31,13 @@ module Gitsucker
           author.ruby_repo_count,
           author.js_repo_count,
           author.score
-        puts
+        @output.puts
       end
     end
 
     def display_header
-      puts column_spacing % Author::STAT_TYPES
-      puts '='*80
+      @output.puts column_spacing % Author::STAT_TYPES
+      @output.puts '='*80
     end
   end
 end
