@@ -3,7 +3,8 @@ Given /^I have a github repo called "([^']*)"$/ do |repo|
 end
 
 When /^I enter the github repo name$/ do
-  @output = `ruby gitsucker.rb #{@repo_query}`
+  path_to_binary = File.expand_path('../../../bin/gitsucker.rb', __FILE__)
+  @output = `ruby #{path_to_binary} #{@repo_query}`
   raise('Command failed') unless $?.success?
 end
 
